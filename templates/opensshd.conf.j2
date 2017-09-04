@@ -224,42 +224,45 @@ DebianBanner {{ 'yes' if (ssh_print_debian_banner|bool) else 'no' }}
 RevokedKeys /etc/ssh/revoked_keys
 
 {% if sftp_enabled %}
-# SFTP matching configuration
-# ===========================
-# Configuration, in case SFTP is used
-# override default of no subsystems
-# Subsystem sftp /opt/app/openssh5/libexec/sftp-server
-
 Subsystem sftp internal-sftp -l INFO -f LOCAL6
-
-# These lines must appear at the *end* of sshd_config
-Match Group sftponly
-ForceCommand internal-sftp -l INFO -f LOCAL6
-ChrootDirectory {{ sftp_chroot_dir }}
-AllowTcpForwarding no
-AllowAgentForwarding no
-PasswordAuthentication no
-PermitRootLogin no
-X11Forwarding no
 {% endif %}
 
-{% if ssh_server_match_group %}
-# Group matching configuration
-# ============================
+#
+## These lines must appear at the *end* of sshd_config
+{% for setting in (sshd_match_settings + sshd_host_match_settings + sshd_group_match_settings) -%}
+Match {{ setting.match }}
+{% if setting.force_command is defined %}
+  ForceCommand {{ setting.force_command }}
+{% endif %}
+{%- if setting.chroot_directory is defined %}
+  ChrootDirectory {{ setting.chroot_directory }}
+{% endif %}
+{%- if setting.allow_tcp_forwarding is defined %}
+  AllowTcpForwarding {{ setting.allow_tcp_forwarding }}
+{% endif %}
+{%- if setting.allow_agent_forwarding is defined %}
+  AllowAgentForwarding {{ setting.allow_agent_forwarding }}
+{% endif %}
+{%- if setting.password_authentication is defined %}
+  PasswordAuthentication {{ setting.password_authentication }}
+{% endif %}
+{%- if setting.permit_root_login is defined %}
+  PermitRootLogin {{ setting.permit_root_login }}
+{% endif %}
+{%- if setting.x11_forwarding is defined %}
+  X11Forwarding {{ setting.x11_forwarding }}
+{% endif %}
+{%- if setting.authentication_methods is defined %}
+  AuthenticationMethods {{ setting.authentication_methods }}
+{% endif %}
+{%- if setting.permit_tty is defined %}
+  PermitTTY {{ setting.permit_tty }}
+{% endif %}
+{%- if setting.permit_open is defined %}
+  PermitOpen {{ setting.permit_open }}
+{% endif %}
+{%- if setting.gateway_ports is defined %}
+  GatewayPorts {{ setting.gateway_ports }}
+{% endif %}
 
-{% for item in ssh_server_match_group %}
-Match Group {{ item.group }}
-    {{ item.rules | indent(4) }}
 {% endfor %}
-{% endif %}
-
-
-{% if ssh_server_match_user %}
-# User matching configuration
-# ===========================
-
-{% for item in ssh_server_match_user %}
-Match User {{ item.user }}
-    {{ item.rules | indent(4) }}
-{% endfor %}
-{% endif %}
