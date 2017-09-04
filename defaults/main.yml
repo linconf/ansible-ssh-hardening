@@ -177,3 +177,8 @@ ssh_challengeresponseauthentication: false
 
 # a list of public keys that are never accepted by the ssh server
 ssh_server_revoked_keys: []
+
+# Additional Variables
+sshd_match_settings: []
+sshd_host_match_settings: []
+sshd_group_match_settings: []
