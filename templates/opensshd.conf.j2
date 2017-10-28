@@ -161,6 +161,10 @@ DenyGroups {{ssh_deny_groups}}
 AllowGroups {{ssh_allow_groups}}
 {% endif %}
 
+{% if ssh_authorized_keys_file %}
+AuthorizedKeysFile {{ ssh_authorized_keys_file }}
+{% endif %}
+
 # Network
 # -------
 
@@ -225,6 +229,16 @@ RevokedKeys /etc/ssh/revoked_keys
 
 {% if sftp_enabled %}
 Subsystem sftp internal-sftp -l INFO -f LOCAL6
+
+# These lines must appear at the *end* of sshd_config
+Match Group sftponly
+    ForceCommand internal-sftp -l INFO -f LOCAL6
+    ChrootDirectory {{ sftp_chroot_dir }}
+    AllowTcpForwarding no
+    AllowAgentForwarding no
+    PasswordAuthentication no
+    PermitRootLogin no
+    X11Forwarding no
 {% endif %}
 
 #

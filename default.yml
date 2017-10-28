@@ -13,6 +13,10 @@
         - "openssh-server"
       ignore_errors: true
     - file: path="/var/run/sshd" state=directory
+    - name: create ssh host keys
+      command: "ssh-keygen -A"
+      when: not ((ansible_os_family in ['Oracle Linux', 'RedHat']) and ansible_distribution_major_version < '7')
+
   roles:
     - ansible-ssh-hardening
   vars:
@@ -20,7 +24,7 @@
     ssh_allow_root_with_key: true
     ssh_allow_tcp_forwarding: true
     ssh_allow_agent_forwarding: true
-    ssh_server_permit_environment_vars: 'PWD'
+    ssh_server_permit_environment_vars: ['PWD','HTTP_PROXY']
     ssh_client_alive_interval: 100
     ssh_client_alive_count: 10
     ssh_client_password_login: true
@@ -32,13 +36,13 @@
     ssh_allow_groups: 'root kitchen vagrant'
     ssh_deny_users: 'foo bar'
     ssh_deny_groups: 'foo bar'
+    ssh_authorized_keys_file: '/etc/ssh/authorized_keys/%u'
     ssh_max_auth_retries: 10
     ssh_permit_tunnel: true
     ssh_print_motd: true
     ssh_print_last_log: true
     ssh_banner: true
     ssh_server_password_login: true
-    ssh_server_enabled: false
     ssh_server_weak_hmac: true
     sftp_enabled: true
     ssh_server_match_group:
