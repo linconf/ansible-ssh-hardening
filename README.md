@@ -12,7 +12,7 @@ Warning: This role disables root-login on the target server! Please make sure yo
 
 ## Requirements
 
-* Ansible > 2.2.1
+* Ansible > 2.4
 
 ## Role Variables
 | Name           | Default Value | Description                        |
@@ -34,6 +34,7 @@ Warning: This role disables root-login on the target server! Please make sure yo
 |`ssh_remote_hosts` | [] | one or more hosts and their custom options for the ssh-client. Default is empty. See examples in `defaults/main.yml`.|
 |`ssh_allow_root_with_key` | false | false to disable root login altogether. Set to true to allow root to login via key-based mechanism.|
 |`ssh_allow_tcp_forwarding` | false | false to disable TCP Forwarding. Set to true to allow TCP Forwarding.|
+|`ssh_gateway_ports` | `false` | `false` to disable binding forwarded ports to non-loopback addresses. Set to `true` to force binding on wildcard address. Set to `clientspecified` to allow the client to specify which address to bind to.|
 |`ssh_allow_agent_forwarding` | false | false to disable Agent Forwarding. Set to true to allow Agent Forwarding.|
 |`ssh_use_pam` | false | false to disable pam authentication.|
 |`ssh_deny_users` | '' | if specified, login is disallowed for user names that match one of the patterns.|
@@ -41,6 +42,10 @@ Warning: This role disables root-login on the target server! Please make sure yo
 |`ssh_deny_groups` | '' | if specified, login is disallowed for users whose primary group or supplementary group list matches one of the patterns.|
 |`ssh_allow_groups` | '' | if specified, login is allowed only for users whose primary group or supplementary group list matches one of the patterns.|
 |`ssh_authorized_keys_file` | '' | change default file that contains the public keys that can be used for user authentication.|
+|`ssh_trusted_user_ca_keys_file` | '' | specifies the file containing trusted certificate authorities public keys used to sign user certificates. |
+|`ssh_trusted_user_ca_keys` | [] | set the trusted certificate authorities public keys used to sign user certificates. Only used if ssh_trusted_user_ca_keys_file is set. |
+|`ssh_authorized_principals_file` | '' | specifies the file containing principals that are allowed. Only used if ssh_trusted_user_ca_keys_file is set. |
+|`ssh_authorized_principals` | [] | list of hashes containing file paths and authorized principals, see default_custom.yml for all options. Only used if ssh_authorized_principals_file is set. |
 |`ssh_print_motd` | false | false to disable printing of the MOTD|
 |`ssh_print_last_log` | false | false to disable display of last login information|
 |`sftp_enabled` | false | true to enable sftp configuration|
@@ -50,6 +55,8 @@ Warning: This role disables root-login on the target server! Please make sure yo
 |`ssh_challengeresponseauthentication` | false | Specifies whether challenge-response authentication is allowed (e.g. via PAM) |
 |`ssh_client_password_login` | false | `true` to allow password-based authentication with the ssh client |
 |`ssh_server_password_login` | false | `true` to allow password-based authentication with the ssh server |
+|`ssh_google_auth` | false | `true` to enable google authenticator based TOTP 2FA |
+|`ssh_pam_device` | false | `true` to enable  public key auth with pam device 2FA |
 |`ssh_banner` | `false` | `true` to print a banner on login |
 |`ssh_client_hardening` | `true` | `false` to stop harden the client |
 |`ssh_client_port` | `'22'` | Specifies the port number to connect on the remote host. |
@@ -63,6 +70,7 @@ Warning: This role disables root-login on the target server! Please make sure yo
 |`ssh_server_permit_environment_vars` | `false` | `true` to specify that ~/.ssh/environment and environment= options in ~/.ssh/authorized_keys are processed by sshd |
 |`ssh_use_dns` | `false` | Specifies whether sshd should look up the remote host name, and to check that the resolved host name for the remote IP address maps back to the very same IP address. |
 |`ssh_server_revoked_keys` | [] | a list of revoked public keys that the ssh server will always reject, useful to revoke known weak or compromised keys.|
+|`ssh_max_startups` | '10:30:100' | Specifies the maximum number of concurrent unauthenticated connections to the SSH daemon.|
 
 ## Example Playbook
 
@@ -162,7 +170,7 @@ See [contributor guideline](CONTRIBUTING.md).
 
 ## License and Author
 
-* Author:: Sebastian Gumprich <sebastian.gumprich@38.de>
+* Author:: Sebastian Gumprich <github@gumpri.ch>
 * Author:: Christoph Hartmann <chris@lollyrock.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
